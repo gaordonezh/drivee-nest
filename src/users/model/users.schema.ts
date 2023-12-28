@@ -28,13 +28,13 @@ export class Users {
   @prop({ required: true, type: String, unique: true })
   email: string;
 
-  @prop({ type: String, unique: true })
+  @prop({ type: String })
   phone: string;
 
   @prop({ enum: UserTypeDocumentEnum })
   t_doc: UserTypeDocumentEnum;
 
-  @prop({ type: String, unique: true })
+  @prop({ type: String })
   n_doc: string;
 
   @prop({ enum: UserSexEnum })

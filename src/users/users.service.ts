@@ -10,6 +10,8 @@ import { CreatePasswordDto, CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { ValidateUserDataDto, ValidateUserDataResponseDto } from './dto/validateUserData.dto';
 import { JwtService } from '@nestjs/jwt';
+import { SendMailService } from 'src/helpers/sendmail/sendmail.service';
+import { TemplateNamesEnum } from 'src/helpers/sendmail/template.enum';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +19,8 @@ export class UsersService {
     @InjectModel(Users)
     private readonly usersModel: ReturnModelType<typeof Users> & PaginateModel<Users, typeof Users>,
     public readonly checkBooleanString: CheckBooleanString,
-    private jwtAuthService: JwtService,
+    private readonly jwtAuthService: JwtService,
+    private readonly sendMailService: SendMailService,
   ) {}
 
   async getUsers(params: UserFiltersDto): Promise<IPaginateResult<Users>> {
@@ -97,7 +100,12 @@ export class UsersService {
     try {
       const res = (await this.usersModel.create(body)).toJSON();
       const token = this.jwtAuthService.sign({ payload: res._id });
-      console.log(token, res);
+      this.sendMailService.sendEmailWithTemplate({
+        email: [body.email],
+        fields: { token, name: res.f_name },
+        subject: 'Bienvenido a Drivee',
+        template: TemplateNamesEnum.CREATE_PASSWORD,
+      });
       return true;
     } catch (error) {
       throw new HttpException(error, HttpStatus.CONFLICT, { cause: new Error('Validation') });
@@ -107,6 +115,13 @@ export class UsersService {
   async createPassword({ token, password }: CreatePasswordDto): Promise<string> {
     try {
       const { payload: user_id } = await this.jwtAuthService.verify(token);
+
+      const findUser = (await this.usersModel.findById(user_id)).toJSON();
+      if (findUser?.password) {
+        throw new HttpException('TOKEN_EXPIRED', HttpStatus.BAD_REQUEST, {
+          cause: new Error('Token expired'),
+        });
+      }
 
       const plainToHash = await hash(password, 10);
       await this.usersModel.findByIdAndUpdate(user_id, { password: plainToHash, isVerified: true });

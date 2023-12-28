@@ -22,7 +22,7 @@ export class UserFiltersDto extends PaginationDto {
   @IsString()
   isActive: string;
 
-  // @ArrayNotEmpty()
+  @ArrayNotEmpty()
   @IsOptional()
   @IsEnum(Array<UserRolesEnum>)
   roles: Array<UserRolesEnum>;

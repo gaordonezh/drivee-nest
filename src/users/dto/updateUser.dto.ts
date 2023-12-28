@@ -7,7 +7,6 @@ import {
   IsEnum,
   IsDateString,
   ValidateNested,
-  IsMongoId,
   Length,
   ArrayUnique,
 } from 'class-validator';

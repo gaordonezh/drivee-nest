@@ -6,11 +6,13 @@ import { UsersService } from './users.service';
 import { Users } from './model/users.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { JWT_SECRET_SEED } from 'src/utils/constants';
+import { SendMailModule } from 'src/helpers/sendmail/sendmail.module';
 
 @Module({
   imports: [
     TypegooseModule.forFeature([Users]),
     JwtModule.register({ secret: JWT_SECRET_SEED, signOptions: { expiresIn: '1d' } }),
+    SendMailModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, CheckBooleanString],
