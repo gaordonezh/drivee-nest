@@ -1,6 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Headers } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CheckTokenDto, LoginAuthDto } from './dto/auth.dto';
+import { LoginAuthDto } from './dto/auth.dto';
 import { Users } from 'src/users/model/users.schema';
 
 @Controller('auth')
@@ -13,7 +13,7 @@ export class AuthController {
   }
 
   @Post('token')
-  checkToken(@Body() body: CheckTokenDto): Promise<Users> {
-    return this.authService.check(body);
+  checkToken(@Headers('Authorization') token: string): Promise<Users> {
+    return this.authService.check(token);
   }
 }

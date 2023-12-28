@@ -22,39 +22,42 @@ export class Users {
   @prop({ required: true, type: String })
   f_name: string;
 
-  @prop({ required: true, type: String })
+  @prop({ type: String })
   l_name: string;
 
-  @prop({ required: true, enum: UserTypeDocumentEnum })
-  t_doc: UserTypeDocumentEnum;
-
   @prop({ required: true, type: String, unique: true })
-  n_doc: string;
-
-  @prop({ required: false, type: String })
   email: string;
 
-  @prop({ required: false, type: String })
-  password: string;
-
-  @prop({ required: false, type: AddressModel })
-  address: AddressModel;
-
-  @prop({ required: false, type: String })
+  @prop({ type: String, unique: true })
   phone: string;
 
-  @prop({ required: false, type: String })
-  photo: string;
+  @prop({ enum: UserTypeDocumentEnum })
+  t_doc: UserTypeDocumentEnum;
 
-  @prop({ required: false, enum: UserSexEnum })
+  @prop({ type: String, unique: true })
+  n_doc: string;
+
+  @prop({ enum: UserSexEnum })
   sex: UserSexEnum;
+
+  @prop({ type: AddressModel })
+  address: AddressModel;
 
   @prop({ required: true, enum: UserRolesEnum, type: [String] })
   roles: Array<UserRolesEnum>;
 
-  @prop({ required: false, type: Date })
+  @prop({ type: String })
+  password: string;
+
+  @prop({ type: Date })
   date_birth: Date;
 
-  @prop({ required: true, type: Boolean, default: true })
+  @prop({ type: String })
+  photo: string;
+
+  @prop({ type: Boolean, default: true })
   isActive: boolean;
+
+  @prop({ type: Boolean, default: false })
+  isVerified: boolean;
 }

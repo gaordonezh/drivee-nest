@@ -4,7 +4,7 @@ import { ReturnModelType } from '@typegoose/typegoose';
 import { HttpException } from '@nestjs/common/exceptions';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { CheckTokenDto, LoginAuthDto } from './dto/auth.dto';
+import { LoginAuthDto } from './dto/auth.dto';
 import { Users } from 'src/users/model/users.schema';
 
 @Injectable()
@@ -15,29 +15,33 @@ export class AuthService {
     private jwtAuthService: JwtService,
   ) {}
 
-  async login(userObject: LoginAuthDto) {
+  async login(userObject: LoginAuthDto): Promise<{ user: Users; token: string }> {
     const { user, password } = userObject;
 
-    const findUser = await this.usersModel.findOne({ n_doc: user, isActive: true });
-    if (!findUser) throw new HttpException('USER_OR_PASSWORD_INCORRECT', 404);
+    const findUser = await this.usersModel
+      .findOne({ email: user, isActive: true, isVerified: true })
+      .select('f_name l_name email phone t_doc n_doc sex address roles password date_birth photo');
+
+    if (!findUser?.password) throw new HttpException('USER_OR_PASSWORD_INCORRECT', 404);
 
     const checkPassword = await compare(password, findUser.password);
     if (!checkPassword) throw new HttpException('USER_OR_PASSWORD_INCORRECT', 403);
 
-    const token = await this.jwtAuthService.sign({ payload: findUser._id });
-    const data = { user: findUser, token };
+    const token = this.jwtAuthService.sign({ payload: findUser._id });
+    const cloneObject = { ...findUser.toJSON() };
+    delete cloneObject.password;
+    const data = { user: cloneObject, token };
 
     return data;
   }
 
-  async check({ token }: CheckTokenDto): Promise<Users> {
+  async check(token: string): Promise<Users> {
     try {
-      const { payload } = await this.jwtAuthService.verify(token);
+      const parsed = token.split(' ')[1];
+      const { payload: user_id } = await this.jwtAuthService.verify(parsed);
       const findUser = await this.usersModel
-        .findOne({ _id: payload, isActive: true })
-        .select(
-          'f_name l_name t_doc n_doc email address phone photo sex roles date_birth headquarters companies',
-        );
+        .findOne({ _id: user_id, isActive: true, isVerified: true })
+        .select('f_name l_name email phone t_doc n_doc sex address roles date_birth photo');
 
       if (!findUser) throw new HttpException('USER_DISABLED', 403);
 

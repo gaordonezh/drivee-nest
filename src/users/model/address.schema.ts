@@ -1,4 +1,5 @@
 import { prop } from '@typegoose/typegoose';
+import { LocationModel } from './location.schema';
 
 export class AddressModel {
   @prop({ required: true, type: String })
@@ -15,4 +16,7 @@ export class AddressModel {
 
   @prop({ required: true, type: String })
   address: string;
+
+  @prop({ required: true, type: LocationModel })
+  location: LocationModel;
 }

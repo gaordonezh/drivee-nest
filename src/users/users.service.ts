@@ -6,9 +6,10 @@ import { InjectModel } from 'nestjs-typegoose';
 import { hash } from 'bcrypt';
 import { Users } from './model/users.schema';
 import { UserFiltersDto } from './dto/listUser.dto';
-import { CreateUserDto } from './dto/createUser.dto';
-import { UpdateParamUserDto, UpdateUserDto } from './dto/updateUser.dto';
-import { DeleteParamUserDto } from './dto/deleteUser.dto';
+import { CreatePasswordDto, CreateUserDto } from './dto/createUser.dto';
+import { UpdateUserDto } from './dto/updateUser.dto';
+import { ValidateUserDataDto, ValidateUserDataResponseDto } from './dto/validateUserData.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
@@ -16,75 +17,121 @@ export class UsersService {
     @InjectModel(Users)
     private readonly usersModel: ReturnModelType<typeof Users> & PaginateModel<Users, typeof Users>,
     public readonly checkBooleanString: CheckBooleanString,
+    private jwtAuthService: JwtService,
   ) {}
 
   async getUsers(params: UserFiltersDto): Promise<IPaginateResult<Users>> {
-    const { next, previous, limit, sortField, sortAscending, willcard, user, isActive, roles } =
-      params;
+    try {
+      const { next, previous, limit, sortField, sortAscending, willcard, user, isActive, roles } =
+        params;
 
-    const filters: Record<string, unknown> = { roles: { $in: roles } };
+      const filters: Record<string, unknown> = {};
 
-    if (willcard) {
-      filters.$or = [
-        { f_name: { $regex: willcard, $options: 'i' } },
-        { l_name: { $regex: willcard, $options: 'i' } },
-        { n_doc: { $regex: willcard, $options: 'i' } },
-        { email: { $regex: willcard, $options: 'i' } },
-      ];
+      if (willcard) {
+        filters.$or = [
+          { f_name: { $regex: willcard, $options: 'i' } },
+          { l_name: { $regex: willcard, $options: 'i' } },
+          { n_doc: { $regex: willcard, $options: 'i' } },
+          { email: { $regex: willcard, $options: 'i' } },
+        ];
+      }
+
+      if (roles) {
+        filters.roles = { $in: roles };
+      }
+
+      if (user) filters._id = user;
+      if (isActive) filters.isActive = isActive;
+
+      const _sortAscending = this.checkBooleanString.parseBoolean(sortAscending);
+
+      const options: IPaginateOptions = {
+        sortField,
+        sortAscending: _sortAscending,
+        limit,
+        next,
+        previous,
+      };
+
+      const projection = {
+        password: 0,
+        isActive: 0,
+        createdAt: 0,
+        updatedAt: 0,
+        __v: 0,
+      };
+
+      return await this.usersModel.findPaged(options, filters, projection);
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST, { cause: new Error('Validation') });
     }
+  }
 
-    if (user) filters._id = user;
-    if (isActive) filters.isActive = isActive;
+  async validateUserData(params: ValidateUserDataDto): Promise<ValidateUserDataResponseDto> {
+    try {
+      const validation: ValidateUserDataResponseDto = {};
+      const { email, n_doc, phone } = params;
 
-    const _sortAscending = this.checkBooleanString.parseBoolean(sortAscending);
+      if (email) {
+        const finder = await this.usersModel.findOne({ email });
+        validation.email = Boolean(finder);
+      }
+      if (n_doc) {
+        const finder = await this.usersModel.findOne({ n_doc });
+        validation.n_doc = Boolean(finder);
+      }
+      if (phone) {
+        const finder = await this.usersModel.findOne({ phone });
+        validation.phone = Boolean(finder);
+      }
 
-    const options: IPaginateOptions = {
-      sortField,
-      sortAscending: _sortAscending,
-      limit,
-      next,
-      previous,
-    };
-
-    const projection = {
-      password: 0,
-      headquarters: 0,
-      companies: 0,
-      isActive: 0,
-      __v: 0,
-    };
-
-    return await this.usersModel.findPaged(options, filters, projection);
+      return validation;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST, {
+        cause: new Error('User fields validation'),
+      });
+    }
   }
 
   async createUser(body: CreateUserDto): Promise<boolean> {
     try {
-      const password = 'password';
-      const plainToHash = await hash(password, 10);
-      const readyBody = { ...body, password: plainToHash };
-      await this.usersModel.create(readyBody);
-
+      const res = (await this.usersModel.create(body)).toJSON();
+      const token = this.jwtAuthService.sign({ payload: res._id });
+      console.log(token, res);
       return true;
     } catch (error) {
       throw new HttpException(error, HttpStatus.CONFLICT, { cause: new Error('Validation') });
     }
   }
 
-  async updateUser(params: UpdateParamUserDto, body: UpdateUserDto): Promise<boolean> {
+  async createPassword({ token, password }: CreatePasswordDto): Promise<string> {
     try {
-      await this.usersModel.findByIdAndUpdate(params.user, body);
-      return true;
+      const { payload: user_id } = await this.jwtAuthService.verify(token);
+
+      const plainToHash = await hash(password, 10);
+      await this.usersModel.findByIdAndUpdate(user_id, { password: plainToHash, isVerified: true });
+
+      return token;
     } catch (error) {
-      throw new HttpException(error, HttpStatus.CONFLICT);
+      throw new HttpException(error, HttpStatus.BAD_REQUEST, { cause: new Error('Validation') });
     }
   }
 
-  async deleteUser(params: DeleteParamUserDto): Promise<boolean> {
+  async updateUser(user_id: string, body: UpdateUserDto): Promise<boolean> {
     try {
-      await this.usersModel.findByIdAndUpdate(params.user, { isActive: false });
+      await this.usersModel.findByIdAndUpdate(user_id, { $set: body });
       return true;
     } catch (error) {
-      throw new HttpException(error, HttpStatus.CONFLICT);
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async deleteUser(user_id: string): Promise<boolean> {
+    try {
+      await this.usersModel.findByIdAndUpdate(user_id, { isActive: false });
+      return true;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
 }

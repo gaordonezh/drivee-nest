@@ -12,18 +12,20 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { UserFiltersDto, UserResponseDto } from './dto/listUser.dto';
-import { CreateUserDto } from './dto/createUser.dto';
-import { UpdateParamUserDto, UpdateUserDto } from './dto/updateUser.dto';
-import { DeleteParamUserDto } from './dto/deleteUser.dto';
+import { UserFiltersDto } from './dto/listUser.dto';
+import { CreatePasswordDto, CreateUserDto } from './dto/createUser.dto';
+import { UpdateUserDto } from './dto/updateUser.dto';
+import { IPaginateResult } from 'typegoose-cursor-pagination';
+import { Users } from './model/users.schema';
+import { ValidateUserDataDto, ValidateUserDataResponseDto } from './dto/validateUserData.dto';
 
-/* @UseGuards(JwtAuthGuard) */
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get()
-  listUsers(@Query() filters: UserFiltersDto): Promise<UserResponseDto> {
+  listUsers(@Query() filters: UserFiltersDto): Promise<IPaginateResult<Users>> {
     return this.usersService.getUsers(filters);
   }
 
@@ -33,13 +35,26 @@ export class UsersController {
     return this.usersService.createUser(body);
   }
 
-  @Put(':user')
-  updateOne(@Param() params: UpdateParamUserDto, @Body() body: UpdateUserDto): Promise<boolean> {
-    return this.usersService.updateUser(params, body);
+  @Post('validate')
+  validate(@Body() body: ValidateUserDataDto): Promise<ValidateUserDataResponseDto> {
+    return this.usersService.validateUserData(body);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('create-password')
+  createPassword(@Body() body: CreatePasswordDto): Promise<string> {
+    return this.usersService.createPassword(body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':user')
+  updateOne(@Param('user') user_id: string, @Body() body: UpdateUserDto): Promise<boolean> {
+    return this.usersService.updateUser(user_id, body);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete(':user')
-  deleteOne(@Param() params: DeleteParamUserDto): Promise<boolean> {
-    return this.usersService.deleteUser(params);
+  deleteOne(@Param('user') user_id: string): Promise<boolean> {
+    return this.usersService.deleteUser(user_id);
   }
 }
