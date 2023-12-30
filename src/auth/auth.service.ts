@@ -15,7 +15,7 @@ export class AuthService {
     private jwtAuthService: JwtService,
   ) {}
 
-  async login(userObject: LoginAuthDto): Promise<{ user: Users; token: string }> {
+  async login(userObject: LoginAuthDto): Promise<Users> {
     const { user, password } = userObject;
 
     const findUser = await this.usersModel
@@ -30,7 +30,7 @@ export class AuthService {
     const token = this.jwtAuthService.sign({ payload: findUser._id });
     const cloneObject = { ...findUser.toJSON() };
     delete cloneObject.password;
-    const data = { user: cloneObject, token };
+    const data = { ...cloneObject, token };
 
     return data;
   }

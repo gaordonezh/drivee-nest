@@ -102,7 +102,7 @@ export class UsersService {
       const token = this.jwtAuthService.sign({ payload: res._id });
       this.sendMailService.sendEmailWithTemplate({
         email: [body.email],
-        fields: { token, name: res.f_name },
+        fields: { token, name: res.f_name, email: res.email },
         subject: 'Bienvenido a Drivee',
         template: TemplateNamesEnum.CREATE_PASSWORD,
       });

@@ -40,7 +40,6 @@ export class UsersController {
     return this.usersService.validateUserData(body);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('create-password')
   createPassword(@Body() body: CreatePasswordDto): Promise<string> {
     return this.usersService.createPassword(body);
