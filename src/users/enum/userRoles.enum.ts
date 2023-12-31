@@ -1,5 +1,5 @@
 export enum UserRolesEnum {
   ADMIN = 'admin',
-  BUYER = 'owner',
-  SELLER = 'user',
+  OWNER = 'owner',
+  USER = 'user',
 }
