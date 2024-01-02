@@ -6,7 +6,6 @@ import {
   IsUrl,
   IsEnum,
   IsDateString,
-  ValidateNested,
   Length,
   ArrayUnique,
 } from 'class-validator';
@@ -48,7 +47,6 @@ export class UpdateUserDto {
   sex?: UserSexEnum;
 
   @IsOptional()
-  @ValidateNested({ each: true })
   @Type(() => AddressModel)
   address?: AddressModel;
 

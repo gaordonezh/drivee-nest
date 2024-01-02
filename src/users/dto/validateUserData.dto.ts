@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsEmail, Length } from 'class-validator';
+import { IsOptional, IsString, IsEmail, Length, IsMongoId } from 'class-validator';
 
 export class ValidateUserDataDto {
   @IsOptional()
@@ -14,6 +14,10 @@ export class ValidateUserDataDto {
   @IsString()
   @Length(8, 12)
   n_doc: string;
+
+  @IsOptional()
+  @IsMongoId()
+  user?: boolean;
 }
 
 export class ValidateUserDataResponseDto {

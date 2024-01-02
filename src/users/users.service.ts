@@ -12,6 +12,7 @@ import { ValidateUserDataDto, ValidateUserDataResponseDto } from './dto/validate
 import { JwtService } from '@nestjs/jwt';
 import { SendMailService } from 'src/helpers/sendmail/sendmail.service';
 import { TemplateNamesEnum } from 'src/helpers/sendmail/template.enum';
+import { FilterQuery } from 'mongoose';
 
 @Injectable()
 export class UsersService {
@@ -73,19 +74,25 @@ export class UsersService {
   async validateUserData(params: ValidateUserDataDto): Promise<ValidateUserDataResponseDto> {
     try {
       const validation: ValidateUserDataResponseDto = {};
-      const { email, n_doc, phone } = params;
+      const { email, n_doc, phone, user } = params;
 
       if (email) {
-        const finder = await this.usersModel.findOne({ email });
-        validation.email = Boolean(finder);
+        const query: FilterQuery<Users> = { email };
+        if (user) query._id = { $ne: user };
+        const counter = await this.usersModel.countDocuments(query);
+        validation.email = counter > 0;
       }
       if (n_doc) {
-        const finder = await this.usersModel.findOne({ n_doc });
-        validation.n_doc = Boolean(finder);
+        const query: FilterQuery<Users> = { n_doc };
+        if (user) query._id = { $ne: user };
+        const counter = await this.usersModel.countDocuments(query);
+        validation.n_doc = counter > 0;
       }
       if (phone) {
-        const finder = await this.usersModel.findOne({ phone });
-        validation.phone = Boolean(finder);
+        const query: FilterQuery<Users> = { phone };
+        if (user) query._id = { $ne: user };
+        const counter = await this.usersModel.countDocuments(query);
+        validation.phone = counter > 0;
       }
 
       return validation;
