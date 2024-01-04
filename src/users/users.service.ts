@@ -26,10 +26,9 @@ export class UsersService {
 
   async getUsers(params: UserFiltersDto): Promise<IPaginateResult<Users>> {
     try {
-      const { next, previous, limit, sortField, sortAscending, willcard, user, isActive, roles } =
-        params;
+      const { next, previous, limit, sortField, sortAscending, willcard, user, isActive, roles } = params;
 
-      const filters: Record<string, unknown> = {};
+      const filters: FilterQuery<Users> = {};
 
       if (willcard) {
         filters.$or = [

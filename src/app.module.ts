@@ -4,6 +4,7 @@ import { TypegooseModule } from 'nestjs-typegoose';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
+import { DocumentsModule } from './documents/documents.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { FilesModule } from './files/files.module';
     AuthModule,
     UsersModule,
     FilesModule,
+    DocumentsModule,
   ],
   controllers: [],
   providers: [],
