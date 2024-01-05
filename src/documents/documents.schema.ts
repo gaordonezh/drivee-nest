@@ -1,7 +1,8 @@
-import { modelOptions, plugin, prop, Severity } from '@typegoose/typegoose';
+import { modelOptions, plugin, prop, Ref, Severity } from '@typegoose/typegoose';
 import paginationPlugin from 'typegoose-cursor-pagination';
 import { Types } from 'mongoose';
 import { DocumentStatusEnum, DocumentTypesEnum } from './documents.enum';
+import { Users } from 'src/users/model/users.schema';
 
 @modelOptions({
   options: {
@@ -17,11 +18,11 @@ import { DocumentStatusEnum, DocumentTypesEnum } from './documents.enum';
 })
 @plugin(paginationPlugin)
 export class Documents {
-  @prop({ type: Types.ObjectId })
-  idUser?: string;
+  @prop({ required: true, type: [Types.ObjectId], ref: () => Users })
+  user?: Ref<Users, string>;
 
   @prop({ type: Types.ObjectId })
-  idVehicle?: string;
+  vehicle?: string;
 
   @prop({ required: true, enum: DocumentTypesEnum })
   type: DocumentTypesEnum;

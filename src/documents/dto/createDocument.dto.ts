@@ -1,14 +1,22 @@
-import { IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsUrl } from 'class-validator';
+import { IsEmail, IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
 import { DocumentTypesEnum } from '../documents.enum';
 
 export class CreateDocumentDto {
   @IsOptional()
   @IsMongoId()
-  idUser?: string;
+  user?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  username: string;
+
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 
   @IsOptional()
   @IsMongoId()
-  idVehicle?: string;
+  vehicle?: string;
 
   @IsNotEmpty()
   @IsEnum(DocumentTypesEnum)

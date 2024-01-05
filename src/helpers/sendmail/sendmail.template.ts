@@ -1,5 +1,6 @@
 import { TemplateNamesEnum } from './template.enum';
 import { TemplateFieldsDto } from './mail.dto';
+import { DOCUMENT_TYPES_TRANSLATE, DocumentStatusEnum } from 'src/documents/documents.enum';
 
 export default {
   [TemplateNamesEnum.CREATE_PASSWORD](params: TemplateFieldsDto) {
@@ -62,6 +63,64 @@ export default {
           </ul>
           <div class="divider"></div>
           <p class="mt-10">Equipo de <b>Drivee</b> ❤️</p>
+        </div>
+      </body>
+    </html>
+    `;
+  },
+  [TemplateNamesEnum.REVIEW_DOCUMENT](params: TemplateFieldsDto) {
+    const texts = {
+      [DocumentStatusEnum.PENDING]: {
+        title: 'Documento pendiente',
+        subtitle: 'Documento pendiente',
+      },
+      [DocumentStatusEnum.REVIEW]: {
+        title: '¡Tu documento esta siendo revisado!',
+        subtitle: `Recibimos tu solicitud de revisón de documentos y te volveremos a informar cuando tu documento finalice el proceso. 🚀`,
+      },
+      [DocumentStatusEnum.APPROVED]: {
+        title: '¡Tu documento fue APROBADO!',
+        subtitle: `Ahora podrás continuar con el proceso de publicación de tu vehículo.`,
+      },
+      [DocumentStatusEnum.REJECTED]: {
+        title: '¡Tu documento fue RECHAZADO!',
+        subtitle: `Lamentablemente no cumple con los requisitos establecidos. Puedes volver a adjuntar tu documento para volver a iniciar el proceso de revisión.`,
+      },
+    };
+
+    const newParams = {
+      ...texts[params.status],
+      name: params.name,
+      document: DOCUMENT_TYPES_TRANSLATE[params.type],
+      comment: params.comment,
+    };
+
+    return `
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <style>
+          * { font-family: 'Arial', sans-serif; margin: 0; padding: 0; }
+          .container { max-width: 600px; margin: 50px auto; }
+          h1 { color: #333; font-size: 24px; font-weight: 900; }
+          h2 { color: #333; font-size: 20px; }
+          p { color: #555; }
+          .divider { height: 1px; background-color: #dddddd; }
+          .mx-10 { margin-top: 10px; margin-bottom: 10px; }
+          .comment { margin-top: 10px; border-left: 5px solid #dddddd; padding-left: 20px; padding-top: 10px; padding-bottom: 10px; font-style: italic; font-size: 14px; color: #757575 }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Revisión de documentos</h1>
+          <h2 class="mx-10">Hola ${newParams.name}</h2>
+          <p class="mx-10">Documento: <b>${newParams.document}</b></p>
+          <p>${newParams.title}</p>
+          <p>${newParams.subtitle}</p>
+
+          <p class="comment">${newParams.comment}</p>
+          <div class="divider"></div>
+          <p class="mx-10">Equipo de <b>Drivee</b> ❤️</p>
         </div>
       </body>
     </html>
