@@ -1,14 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-  IsOptional,
-  IsString,
-  IsEmail,
-  IsUrl,
-  IsEnum,
-  IsDateString,
-  Length,
-  ArrayUnique,
-} from 'class-validator';
+import { IsOptional, IsString, IsEmail, IsUrl, IsEnum, IsDateString, Length, ArrayUnique } from 'class-validator';
 import { AddressModel } from '../model/address.schema';
 import { UserTypeDocumentEnum } from '../enum/userTypeDocument.enum';
 import { UserSexEnum } from '../enum/userSex.enum';

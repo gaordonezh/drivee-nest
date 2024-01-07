@@ -40,7 +40,7 @@ export class Users {
   @prop({ enum: UserSexEnum })
   sex: UserSexEnum;
 
-  @prop({ type: AddressModel })
+  @prop({ type: AddressModel, _id: false })
   address: AddressModel;
 
   @prop({ required: true, enum: UserRolesEnum, type: [String] })

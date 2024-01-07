@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Delete,
-  HttpCode,
-  Param,
-  Put,
-  Query,
-  Get,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Body, Delete, Param, Put, Query, Get, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UserFiltersDto } from './dto/listUser.dto';
@@ -29,7 +18,6 @@ export class UsersController {
     return this.usersService.getUsers(filters);
   }
 
-  @HttpCode(202)
   @Post()
   createUser(@Body() body: CreateUserDto): Promise<boolean> {
     return this.usersService.createUser(body);

@@ -1,4 +1,14 @@
-import { IsEmail, IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
+import {
+  ArrayUnique,
+  IsBoolean,
+  IsEmail,
+  IsEnum,
+  IsMongoId,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 import { DocumentTypesEnum } from '../documents.enum';
 
 export class CreateDocumentDto {
@@ -25,4 +35,13 @@ export class CreateDocumentDto {
   @IsNotEmpty()
   @IsUrl()
   url: string;
+
+  @IsOptional()
+  @IsEnum(DocumentTypesEnum, { each: true })
+  @ArrayUnique()
+  documents?: Array<DocumentTypesEnum>;
+
+  @IsOptional()
+  @IsBoolean()
+  skip?: boolean;
 }

@@ -6,9 +6,10 @@ import { DocumentsService } from './documents.service';
 import { CheckBooleanString } from 'src/utils/checkBooleanString';
 import { Users } from 'src/users/model/users.schema';
 import { SendMailModule } from 'src/helpers/sendmail/sendmail.module';
+import { Vehicles } from 'src/vehicles/models/vehicle.schema';
 
 @Module({
-  imports: [TypegooseModule.forFeature([Documents, Users]), SendMailModule],
+  imports: [TypegooseModule.forFeature([Documents, Users, Vehicles]), SendMailModule],
   controllers: [DocumentsController],
   providers: [DocumentsService, CheckBooleanString],
 })

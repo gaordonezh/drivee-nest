@@ -12,6 +12,7 @@ import { Users } from 'src/users/model/users.schema';
 import { DocumentPopulateEnum, DocumentStatusEnum } from './documents.enum';
 import { SendMailService } from 'src/helpers/sendmail/sendmail.service';
 import { TemplateNamesEnum } from 'src/helpers/sendmail/template.enum';
+import { Vehicles } from 'src/vehicles/models/vehicle.schema';
 
 @Injectable()
 export class DocumentsService {
@@ -20,6 +21,8 @@ export class DocumentsService {
     private readonly documentsModel: ReturnModelType<typeof Documents> & PaginateModel<Documents, typeof Documents>,
     @InjectModel(Users)
     private readonly usersModel: ReturnModelType<typeof Users> & PaginateModel<Users, typeof Users>,
+    @InjectModel(Vehicles)
+    private readonly vehiclesModel: ReturnModelType<typeof Vehicles> & PaginateModel<Vehicles, typeof Vehicles>,
     private readonly checkBooleanString: CheckBooleanString,
     private readonly sendMailService: SendMailService,
   ) {}
@@ -57,6 +60,9 @@ export class DocumentsService {
           const selectFields = 'f_name l_name email t_doc n_doc phone photo';
           populateOptions.push({ model: this.usersModel, path: 'user', select: selectFields });
         }
+        if (populate.includes(DocumentPopulateEnum.VEHICLE)) {
+          populateOptions.push({ model: this.vehiclesModel, path: 'vehicle', select: 'name images status user' });
+        }
       }
 
       return await this.documentsModel.findPaged(options, filters, projection, populateOptions);
@@ -68,15 +74,22 @@ export class DocumentsService {
   async createDocument(body: CreateDocumentDto): Promise<boolean> {
     try {
       await this.documentsModel.create(body);
+      if (body.skip) return true;
       this.sendMailService.sendEmailWithTemplate({
         email: ['gaordonezh@gmail.com', body.email],
-        fields: { status: DocumentStatusEnum.REVIEW, type: body.type, comment: '', name: body.username },
+        fields: {
+          status: DocumentStatusEnum.REVIEW,
+          type: body.type,
+          comment: '',
+          name: body.username,
+          documents: body.documents,
+        },
         subject: 'Revisión de documentos',
         template: TemplateNamesEnum.REVIEW_DOCUMENT,
       });
       return true;
     } catch (error) {
-      throw new HttpException(error, HttpStatus.CONFLICT, { cause: new Error('Validation') });
+      throw new HttpException(error, HttpStatus.BAD_REQUEST, { cause: new Error('Validation') });
     }
   }
 
@@ -95,7 +108,7 @@ export class DocumentsService {
 
       return true;
     } catch (error) {
-      throw new HttpException(error, HttpStatus.CONFLICT, { cause: new Error('Validation') });
+      throw new HttpException(error, HttpStatus.BAD_REQUEST, { cause: new Error('Validation') });
     }
   }
 
@@ -104,7 +117,7 @@ export class DocumentsService {
       await this.documentsModel.findByIdAndUpdate(docId, { isActive: false });
       return true;
     } catch (error) {
-      throw new HttpException(error, HttpStatus.CONFLICT, { cause: new Error('Validation') });
+      throw new HttpException(error, HttpStatus.BAD_REQUEST, { cause: new Error('Validation') });
     }
   }
 }

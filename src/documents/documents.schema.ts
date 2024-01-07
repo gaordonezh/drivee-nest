@@ -3,6 +3,7 @@ import paginationPlugin from 'typegoose-cursor-pagination';
 import { Types } from 'mongoose';
 import { DocumentStatusEnum, DocumentTypesEnum } from './documents.enum';
 import { Users } from 'src/users/model/users.schema';
+import { Vehicles } from 'src/vehicles/models/vehicle.schema';
 
 @modelOptions({
   options: {
@@ -18,10 +19,10 @@ import { Users } from 'src/users/model/users.schema';
 })
 @plugin(paginationPlugin)
 export class Documents {
-  @prop({ required: true, type: [Types.ObjectId], ref: () => Users })
+  @prop({ type: Types.ObjectId, ref: () => Users })
   user?: Ref<Users, string>;
 
-  @prop({ type: Types.ObjectId })
+  @prop({ type: Types.ObjectId, ref: () => Vehicles })
   vehicle?: string;
 
   @prop({ required: true, enum: DocumentTypesEnum })

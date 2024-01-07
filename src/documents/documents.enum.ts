@@ -25,5 +25,5 @@ export const DOCUMENT_TYPES_TRANSLATE = {
   [DocumentTypesEnum.DRIVER_LICENSE]: 'Licencia de conducir',
   [DocumentTypesEnum.OWNERSHIP_CARD]: 'Tarjeta de propiedad',
   [DocumentTypesEnum.TECHNICAL_INSPECTION]: 'Inspección técnica',
-  [DocumentTypesEnum.POLARIZED_GLASS]: 'Autorización para vidrio polarizado',
+  [DocumentTypesEnum.POLARIZED_GLASS]: 'Permiso para vidrio polarizado',
 };

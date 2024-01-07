@@ -1,6 +1,6 @@
 import { TemplateNamesEnum } from './template.enum';
 import { TemplateFieldsDto } from './mail.dto';
-import { DOCUMENT_TYPES_TRANSLATE, DocumentStatusEnum } from 'src/documents/documents.enum';
+import { DOCUMENT_TYPES_TRANSLATE, DocumentStatusEnum, DocumentTypesEnum } from 'src/documents/documents.enum';
 
 export default {
   [TemplateNamesEnum.CREATE_PASSWORD](params: TemplateFieldsDto) {
@@ -75,7 +75,7 @@ export default {
         subtitle: 'Documento pendiente',
       },
       [DocumentStatusEnum.REVIEW]: {
-        title: '¡Tu documento esta siendo revisado!',
+        title: '¡Tus documento esta siendo revisado!',
         subtitle: `Recibimos tu solicitud de revisón de documentos y te volveremos a informar cuando tu documento finalice el proceso. 🚀`,
       },
       [DocumentStatusEnum.APPROVED]: {
@@ -88,10 +88,14 @@ export default {
       },
     };
 
+    const document = Array.isArray(params.documents)
+      ? params.documents.map((item) => DOCUMENT_TYPES_TRANSLATE[item]).join(' - ')
+      : DOCUMENT_TYPES_TRANSLATE[params.type as DocumentTypesEnum];
+
     const newParams = {
-      ...texts[params.status],
+      ...texts[params.status as DocumentStatusEnum],
       name: params.name,
-      document: DOCUMENT_TYPES_TRANSLATE[params.type],
+      document,
       comment: params.comment,
     };
 
@@ -114,7 +118,7 @@ export default {
         <div class="container">
           <h1>Revisión de documentos</h1>
           <h2 class="mx-10">Hola ${newParams.name}</h2>
-          <p class="mx-10">Documento: <b>${newParams.document}</b></p>
+          <p class="mx-10">Documento(s): <b>${newParams.document}</b></p>
           <p>${newParams.title}</p>
           <p>${newParams.subtitle}</p>
 

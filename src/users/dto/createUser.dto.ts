@@ -8,7 +8,6 @@ import {
   IsEnum,
   IsDateString,
   ArrayNotEmpty,
-  ValidateNested,
   Length,
   ArrayUnique,
 } from 'class-validator';
@@ -50,7 +49,6 @@ export class CreateUserDto {
   sex?: UserSexEnum;
 
   @IsOptional()
-  @ValidateNested({ each: true })
   @Type(() => AddressModel)
   address?: AddressModel;
 

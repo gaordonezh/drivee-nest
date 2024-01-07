@@ -17,7 +17,7 @@ export class AddressModel {
   @prop({ required: true, type: String })
   address: string;
 
-  @prop({ required: true, type: LocationModel })
+  @prop({ required: true, type: LocationModel, _id: false })
   location: LocationModel;
 
   @prop({ required: true, type: String })

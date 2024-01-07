@@ -1,11 +1,4 @@
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsMongoId,
-  ArrayNotEmpty,
-  IsEnum,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsMongoId, ArrayNotEmpty, IsEnum } from 'class-validator';
 import { PaginationDto } from 'src/utils/dto/globals.dto';
 import { UserRolesEnum } from '../enum/userRoles.enum';
 
