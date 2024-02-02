@@ -22,7 +22,7 @@ async function bootstrap() {
     console.log(
       `service ${config.get('npm_package_name')} is listening on port ${config.get(
         'APP_PORT',
-      )} with prefix path '/${config.get('APP_PREFIX')}' in the environment ${config.get('NODE_ENV')} 🚀`,
+      )} with prefix path '${config.get('APP_PREFIX')}' in the environment ${config.get('NODE_ENV')} 🚀`,
       'AppStart',
     ),
   );
