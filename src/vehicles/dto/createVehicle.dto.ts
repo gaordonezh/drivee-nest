@@ -1,8 +1,9 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsString, ArrayNotEmpty, ValidateNested, IsNumber, IsNotEmptyObject } from 'class-validator';
+import { IsNotEmpty, IsString, ArrayNotEmpty, ValidateNested, IsNumber, IsNotEmptyObject, IsEnum } from 'class-validator';
 import { UserReferenceModel } from '../models/user.reference.schema';
 import { AddressModel } from 'src/users/model/address.schema';
 import { VehicleDetailsModel } from '../models/vehicle.details.schema';
+import { VehicleTypeEnum } from '../vehicle.enum';
 
 export class CreateVehicleDto {
   @IsNotEmptyObject()
@@ -32,4 +33,8 @@ export class CreateVehicleDto {
   @ValidateNested({ each: true })
   @Type(() => Array<VehicleDetailsModel>)
   details: Array<VehicleDetailsModel>;
+
+  @IsNotEmpty()
+  @IsEnum(VehicleTypeEnum)
+  type: VehicleTypeEnum;
 }

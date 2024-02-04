@@ -1,7 +1,7 @@
 import { modelOptions, plugin, prop, Severity } from '@typegoose/typegoose';
 import paginationPlugin from 'typegoose-cursor-pagination';
 import { AddressModel } from 'src/users/model/address.schema';
-import { VehicleStatusEnum } from '../vehicle.enum';
+import { VehicleStatusEnum, VehicleTypeEnum } from '../vehicle.enum';
 import { VehicleDetailsModel } from './vehicle.details.schema';
 import { UserReferenceModel } from './user.reference.schema';
 import { DocumentTypesEnum } from 'src/documents/documents.enum';
@@ -25,6 +25,9 @@ export class Vehicles {
 
   @prop({ required: true, type: String })
   name: string;
+
+  @prop({ required: true, enum: VehicleTypeEnum })
+  type: VehicleTypeEnum;
 
   @prop({ required: true, type: String })
   description: string;

@@ -11,7 +11,7 @@ import {
 } from 'class-validator';
 import { UserReferenceModel } from '../models/user.reference.schema';
 import { AddressModel } from 'src/users/model/address.schema';
-import { VehicleStatusEnum } from '../vehicle.enum';
+import { VehicleStatusEnum, VehicleTypeEnum } from '../vehicle.enum';
 import { VehicleDetailsModel } from '../models/vehicle.details.schema';
 import { DocumentTypesEnum } from 'src/documents/documents.enum';
 
@@ -56,4 +56,8 @@ export class UpdateVehicleDto {
   @IsEnum(DocumentTypesEnum, { each: true })
   @ArrayUnique()
   documents?: Array<DocumentTypesEnum>;
+
+  @IsOptional()
+  @IsEnum(VehicleTypeEnum)
+  type?: VehicleTypeEnum;
 }

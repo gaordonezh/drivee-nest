@@ -3,3 +3,8 @@ export enum VehicleStatusEnum {
   AVAILABLE = 'available',
   NOT_AVAILABLE = 'not_available',
 }
+
+export enum VehicleTypeEnum {
+  CAR = 'car',
+  BIKE = 'bike',
+}
