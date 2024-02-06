@@ -23,7 +23,7 @@ export class Documents {
   user?: Ref<Users, string>;
 
   @prop({ type: Types.ObjectId, ref: () => Vehicles })
-  vehicle?: string;
+  vehicle?: Ref<Vehicles, string>;
 
   @prop({ required: true, enum: DocumentTypesEnum })
   type: DocumentTypesEnum;

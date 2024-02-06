@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { DocumentsModule } from './documents/documents.module';
 import { VehiclesModule } from './vehicles/vehicle.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { VehiclesModule } from './vehicles/vehicle.module';
     VehiclesModule,
     FilesModule,
     DocumentsModule,
+    CommentsModule,
   ],
   controllers: [],
   providers: [],

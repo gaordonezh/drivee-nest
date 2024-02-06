@@ -8,6 +8,7 @@ import { CreateVehicleDto } from './dto/createVehicle.dto';
 import { UpdateVehicleDto } from './dto/updateVehicle.dto';
 import { FilterQuery } from 'mongoose';
 import { GetPublicVehiclesDto, GetVehiclesDto } from './dto/getVehicles.dto';
+import { VehicleStatusEnum } from './vehicle.enum';
 
 @Injectable()
 export class VehiclesService {
@@ -35,7 +36,7 @@ export class VehiclesService {
         willcard,
       } = params;
 
-      const filters: FilterQuery<Vehicles> = { isActive: true };
+      const filters: FilterQuery<Vehicles> = { isActive: true, status: VehicleStatusEnum.AVAILABLE };
       if (type) filters.type = type;
       // if (dateFrom && dateTo) {
       // }
