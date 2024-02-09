@@ -1,11 +1,15 @@
-import { IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsMongoId, IsOptional, IsString } from 'class-validator';
 import { PaginationDto } from 'src/utils/dto/globals.dto';
 import { VehicleTypeEnum } from '../vehicle.enum';
 
 export class GetVehiclesDto extends PaginationDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsMongoId()
-  user: string;
+  user?: string;
+
+  @IsOptional()
+  @IsMongoId()
+  vehicle?: string;
 }
 
 export class GetPublicVehiclesDto extends PaginationDto {
@@ -40,4 +44,8 @@ export class GetPublicVehiclesDto extends PaginationDto {
   @IsOptional()
   @IsString()
   priceTo: string;
+
+  @IsOptional()
+  @IsMongoId()
+  id: string;
 }

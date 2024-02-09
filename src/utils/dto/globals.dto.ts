@@ -4,23 +4,23 @@ import { Transform } from 'class-transformer';
 export class PaginationDto {
   @IsOptional()
   @IsString()
-  next: string;
+  next?: string;
 
   @IsOptional()
   @IsString()
-  previous: string;
+  previous?: string;
 
   @Transform(({ value }) => +value || 10)
   @IsOptional()
   @IsNumber()
-  limit: number;
+  limit?: number;
 
   @IsOptional()
   @IsString()
-  sortField: string;
+  sortField?: string;
 
   @IsOptional()
   @IsBooleanString()
   @IsEnum(['true', 'false'])
-  sortAscending: string;
+  sortAscending?: string;
 }

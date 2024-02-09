@@ -11,7 +11,7 @@ import { SendMailModule } from 'src/helpers/sendmail/sendmail.module';
 @Module({
   imports: [
     TypegooseModule.forFeature([Users]),
-    JwtModule.register({ secret: JWT_SECRET_SEED, signOptions: { expiresIn: '7d' } }),
+    JwtModule.register({ secret: JWT_SECRET_SEED, signOptions: { expiresIn: '30d' } }),
     SendMailModule,
   ],
   controllers: [AuthController],

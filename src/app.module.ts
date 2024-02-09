@@ -7,6 +7,7 @@ import { FilesModule } from './files/files.module';
 import { DocumentsModule } from './documents/documents.module';
 import { VehiclesModule } from './vehicles/vehicle.module';
 import { CommentsModule } from './comments/comments.module';
+import { BookingModule } from './booking/booking.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CommentsModule } from './comments/comments.module';
     FilesModule,
     DocumentsModule,
     CommentsModule,
+    BookingModule,
   ],
   controllers: [],
   providers: [],
