@@ -2,7 +2,7 @@ import { Controller, Post, Body, UseGuards, Get, Query, Param, Put, Delete } fro
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { DocumentsService } from './documents.service';
 import { CreateDocumentDto } from './dto/createDocument.dto';
-import { GetDocumentsDto } from './dto/getDocument.dto';
+import { GetDocumentsDto, VerifyDocumentsDto, VerifyDocumentsResponse } from './dto/getDocument.dto';
 import { IPaginateResult } from 'typegoose-cursor-pagination';
 import { Documents } from './documents.schema';
 import { UpdateDocumentDto } from './dto/updateDocument.dto';
@@ -15,6 +15,11 @@ export class DocumentsController {
   @Get()
   list(@Query() filters: GetDocumentsDto): Promise<IPaginateResult<Documents>> {
     return this.documentsService.getDocuments(filters);
+  }
+
+  @Get('verify')
+  verify(@Query() filters: VerifyDocumentsDto): Promise<VerifyDocumentsResponse> {
+    return this.documentsService.verifyDocuments(filters);
   }
 
   @Post()

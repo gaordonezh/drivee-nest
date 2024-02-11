@@ -4,7 +4,7 @@ import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { Documents } from './documents.schema';
 import { CreateDocumentDto } from './dto/createDocument.dto';
-import { GetDocumentsDto } from './dto/getDocument.dto';
+import { GetDocumentsDto, VerifyDocumentsDto, VerifyDocumentsResponse } from './dto/getDocument.dto';
 import { FilterQuery } from 'mongoose';
 import { CheckBooleanString } from 'src/utils/checkBooleanString';
 import { UpdateDocumentDto } from './dto/updateDocument.dto';
@@ -118,6 +118,26 @@ export class DocumentsService {
       return true;
     } catch (error) {
       throw new HttpException(error, HttpStatus.BAD_REQUEST, { cause: new Error('Validation') });
+    }
+  }
+
+  async verifyDocuments(params: VerifyDocumentsDto): Promise<VerifyDocumentsResponse> {
+    try {
+      const { user, vehicle } = params;
+      const response = { user: Boolean(user), vehicle: Boolean(vehicle) };
+
+      if (user) {
+        const res = await this.documentsModel.find({ isActive: true, user });
+        if (res.length) response.user = res.filter((item) => item.status !== DocumentStatusEnum.APPROVED).length > 0;
+      }
+      if (vehicle) {
+        const res = await this.documentsModel.find({ isActive: true, vehicle });
+        if (res.length) response.vehicle = res.filter((item) => item.status !== DocumentStatusEnum.APPROVED).length > 0;
+      }
+
+      return response;
+    } catch (error) {
+      return { user: true, vehicle: true };
     }
   }
 }

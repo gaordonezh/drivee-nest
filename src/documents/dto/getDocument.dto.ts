@@ -24,3 +24,18 @@ export class GetDocumentsDto extends PaginationDto {
   @ArrayUnique()
   populate?: Array<DocumentPopulateEnum>;
 }
+
+export class VerifyDocumentsDto {
+  @IsOptional()
+  @IsMongoId()
+  user: string;
+
+  @IsOptional()
+  @IsMongoId()
+  vehicle: string;
+}
+
+export class VerifyDocumentsResponse {
+  user?: boolean;
+  vehicle?: boolean;
+}

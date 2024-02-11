@@ -11,6 +11,9 @@ import { BookingPopulateEnum, BookingStatusEnum } from './booking.enum';
 import { ListBookingDto } from './dto/listBooking.dto';
 import { FilterQuery } from 'mongoose';
 import { Users } from 'src/users/model/users.schema';
+import { UpdateBookingDto } from './dto/updateBooking.dto';
+import { SendMailService } from 'src/helpers/sendmail/sendmail.service';
+import { TemplateNamesEnum } from 'src/helpers/sendmail/template.enum';
 
 @Injectable()
 export class BookingService {
@@ -21,6 +24,7 @@ export class BookingService {
     private readonly vehiclesModel: ReturnModelType<typeof Vehicles> & PaginateModel<Vehicles, typeof Vehicles>,
     @InjectModel(Users)
     private readonly usersModel: ReturnModelType<typeof Users> & PaginateModel<Users, typeof Users>,
+    private readonly sendMailService: SendMailService,
     public readonly checkBooleanString: CheckBooleanString,
   ) {}
 
@@ -33,8 +37,10 @@ export class BookingService {
       if (owner) filters['vehicle.owner'] = owner;
       if (status) filters.status = status;
 
+      const _sortField = sortField ?? 'updatedAt';
+
       const options: IPaginateOptions = {
-        sortField,
+        sortField: _sortField,
         sortAscending: this.checkBooleanString.parseBoolean(sortAscending),
         limit,
         next,
@@ -76,7 +82,14 @@ export class BookingService {
 
       const booking = await this.bookingModel.findOne({
         'vehicle.id': body.vehicle.id,
-        status: { $in: [BookingStatusEnum.PENDING, BookingStatusEnum.APPROVED] },
+        status: {
+          $in: [
+            BookingStatusEnum.PENDING,
+            BookingStatusEnum.APPROVED,
+            BookingStatusEnum.PAYMENT,
+            BookingStatusEnum.IN_PROCCESS,
+          ],
+        },
         $or: [
           { startDatetime: { $gte: dateStart, $lte: dateEnd } }, // startDatetime dentro del rango
           { endDatetime: { $gte: dateStart, $lte: dateEnd } }, // endDatetime dentro del rango
@@ -89,9 +102,61 @@ export class BookingService {
       body.vehicle.owner = String(vehicle.user.id);
       await this.bookingModel.create(body);
 
+      this.sendMailService.sendEmailWithTemplate({
+        email: [vehicle.user.email, body.user.email],
+        fields: {
+          vehicle: vehicle.name,
+          from: body.startDatetime,
+          to: body.endDatetime,
+          hours: body.totalHours,
+          total: body.totalPrice,
+        },
+        subject: `Tienes una reservación pendiente de ${vehicle.name}`,
+        template: TemplateNamesEnum.PENDING_RENT_CAR,
+      });
+
       return { success: true, message: 'Reserva ingresada correctamente' };
     } catch (error) {
       return { success: false, message: error.message };
+    }
+  }
+
+  async status(bookingId: string, body: UpdateBookingDto): Promise<boolean> {
+    try {
+      const toUpdate: UpdateBookingDto = {};
+      if (body.status) toUpdate.status = body.status;
+      if (body.comment) toUpdate.comment = body.comment;
+
+      const res = await this.bookingModel.findByIdAndUpdate(bookingId, { $set: toUpdate });
+      console.log(res);
+
+      if (body.status === BookingStatusEnum.REJECTED) {
+        this.sendMailService.sendEmailWithTemplate({
+          email: [res.user.email],
+          fields: { name: res.user.f_name, vehicle: res.vehicle.name, comment: body.comment },
+          subject: `La solicitud de reserva de ${res.vehicle.name} fue rechazada`,
+          template: TemplateNamesEnum.REJECTED_RENT_CAR,
+        });
+      }
+
+      if (body.status === BookingStatusEnum.APPROVED) {
+        this.sendMailService.sendEmailWithTemplate({
+          email: [res.user.email],
+          fields: {
+            name: res.user.f_name,
+            vehicle: res.vehicle.name,
+            comment: body.comment,
+            from: String(res.startDatetime),
+            to: String(res.endDatetime),
+          },
+          subject: `La solicitud de reserva de ${res.vehicle.name} fue aprobada`,
+          template: TemplateNamesEnum.APPROVED_RENT_CAR,
+        });
+      }
+
+      return true;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST, { cause: new Error(error) });
     }
   }
 }

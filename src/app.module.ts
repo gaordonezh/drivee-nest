@@ -8,6 +8,7 @@ import { DocumentsModule } from './documents/documents.module';
 import { VehiclesModule } from './vehicles/vehicle.module';
 import { CommentsModule } from './comments/comments.module';
 import { BookingModule } from './booking/booking.module';
+import { CronModule } from './cron/cron.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { BookingModule } from './booking/booking.module';
     DocumentsModule,
     CommentsModule,
     BookingModule,
+    CronModule,
   ],
   controllers: [],
   providers: [],

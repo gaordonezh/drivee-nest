@@ -39,4 +39,7 @@ export class Booking {
 
   @prop({ required: true, enum: BookingStatusEnum, default: BookingStatusEnum.PENDING })
   status: BookingStatusEnum;
+
+  @prop({ required: false, type: String })
+  comment: string;
 }

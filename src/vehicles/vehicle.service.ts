@@ -105,7 +105,14 @@ export class VehiclesService {
 
         const reservas = await this.bookingService.find({
           'vehicle.id': { $in: vehicleIds },
-          status: { $in: [BookingStatusEnum.PENDING, BookingStatusEnum.APPROVED] },
+          status: {
+            $in: [
+              BookingStatusEnum.PENDING,
+              BookingStatusEnum.APPROVED,
+              BookingStatusEnum.PAYMENT,
+              BookingStatusEnum.IN_PROCCESS,
+            ],
+          },
           $or: [
             { startDatetime: { $gte: dateStart, $lte: dateEnd } }, // startDatetime dentro del rango
             { endDatetime: { $gte: dateStart, $lte: dateEnd } }, // endDatetime dentro del rango

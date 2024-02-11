@@ -1,8 +1,8 @@
 {
   "name": "drivee",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "version": "1.0.0",
+  "description": "Drivee",
+  "author": "German Ordoñez",
   "private": true,
   "license": "MIT",
   "scripts": {
@@ -22,6 +22,7 @@
     "@nestjs/jwt": "^10.1.0",
     "@nestjs/passport": "^10.0.0",
     "@nestjs/platform-express": "^9.0.0",
+    "@nestjs/schedule": "^4.0.1",
     "@typegoose/typegoose": "^11.3.0",
     "aws-sdk": "^2.1528.0",
     "bcrypt": "^5.1.0",
