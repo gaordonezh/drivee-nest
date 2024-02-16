@@ -74,4 +74,14 @@ export class CreatePasswordDto {
   @IsNotEmpty()
   @IsString()
   password: string;
+
+  @IsOptional()
+  @IsString()
+  action?: string;
+}
+
+export class ForgotPasswordDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 }

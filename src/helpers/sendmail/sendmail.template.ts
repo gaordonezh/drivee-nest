@@ -25,7 +25,7 @@ export default {
           <h2>Creación de Contraseña</h2>
           <p>Hola ${params.name},</p>
           <p>Hemos recibido tu solicitud de creación de contraseña. Haz clic en el siguiente enlace para continuar con el proceso:</p>
-          <a href="http://localhost:3000/auth/create-password?token=${params.token}&email=${params.email}" target="_blank" class="btn">Crear Contraseña</a>
+          <a href="https://drivee.aldo.codes/auth/create-password?token=${params.token}&email=${params.email}&action=${params.action}" target="_blank" class="btn">Crear Contraseña</a>
           <p>Si no lo solicitaste, puedes ignorar este mensaje. El enlace caducará en 24 horas.</p>
           <div class="divider"></div>
           <p>Equipo de <b>Drivee</b> ❤️</p>

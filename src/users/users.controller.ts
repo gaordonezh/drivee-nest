@@ -2,8 +2,8 @@ import { Controller, Post, Body, Delete, Param, Put, Query, Get, UseGuards } fro
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UserFiltersDto } from './dto/listUser.dto';
-import { CreatePasswordDto, CreateUserDto } from './dto/createUser.dto';
-import { UpdateUserDto } from './dto/updateUser.dto';
+import { CreatePasswordDto, CreateUserDto, ForgotPasswordDto } from './dto/createUser.dto';
+import { UpdateUserDto, UpdateUserPasswordDto } from './dto/updateUser.dto';
 import { IPaginateResult } from 'typegoose-cursor-pagination';
 import { Users } from './model/users.schema';
 import { ValidateUserDataDto, ValidateUserDataResponseDto } from './dto/validateUserData.dto';
@@ -33,10 +33,21 @@ export class UsersController {
     return this.usersService.createPassword(body);
   }
 
+  @Post('forgot-password')
+  forgotPassword(@Body() body: ForgotPasswordDto): Promise<boolean> {
+    return this.usersService.forgotPassword(body);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Put(':user')
   updateOne(@Param('user') user_id: string, @Body() body: UpdateUserDto): Promise<boolean> {
     return this.usersService.updateUser(user_id, body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('update-password/:user')
+  updatePassword(@Param('user') user_id: string, @Body() body: UpdateUserPasswordDto): Promise<boolean> {
+    return this.usersService.updateUserPassword(user_id, body);
   }
 
   @UseGuards(JwtAuthGuard)

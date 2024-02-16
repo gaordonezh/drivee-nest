@@ -1,5 +1,15 @@
 import { Type } from 'class-transformer';
-import { IsOptional, IsString, IsEmail, IsUrl, IsEnum, IsDateString, Length, ArrayUnique } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsEmail,
+  IsUrl,
+  IsEnum,
+  IsDateString,
+  Length,
+  ArrayUnique,
+  IsNotEmpty,
+} from 'class-validator';
 import { AddressModel } from '../model/address.schema';
 import { UserTypeDocumentEnum } from '../enum/userTypeDocument.enum';
 import { UserSexEnum } from '../enum/userSex.enum';
@@ -53,4 +63,16 @@ export class UpdateUserDto {
   @IsOptional()
   @IsUrl()
   photo?: string;
+}
+
+export class UpdateUserPasswordDto {
+  @IsNotEmpty()
+  @IsString()
+  @Length(8, 20)
+  current: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(8, 20)
+  new: string;
 }

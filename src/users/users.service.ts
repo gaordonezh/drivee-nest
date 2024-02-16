@@ -3,11 +3,11 @@ import { IPaginateOptions, IPaginateResult, PaginateModel } from 'typegoose-curs
 import { CheckBooleanString } from '../utils/checkBooleanString';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
-import { hash } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import { Users } from './model/users.schema';
 import { UserFiltersDto } from './dto/listUser.dto';
-import { CreatePasswordDto, CreateUserDto } from './dto/createUser.dto';
-import { UpdateUserDto } from './dto/updateUser.dto';
+import { CreatePasswordDto, CreateUserDto, ForgotPasswordDto } from './dto/createUser.dto';
+import { UpdateUserDto, UpdateUserPasswordDto } from './dto/updateUser.dto';
 import { ValidateUserDataDto, ValidateUserDataResponseDto } from './dto/validateUserData.dto';
 import { JwtService } from '@nestjs/jwt';
 import { SendMailService } from 'src/helpers/sendmail/sendmail.service';
@@ -118,21 +118,37 @@ export class UsersService {
     }
   }
 
-  async createPassword({ token, password }: CreatePasswordDto): Promise<string> {
+  async createPassword({ token, password, action }: CreatePasswordDto): Promise<string> {
     try {
       const { payload: user_id } = await this.jwtAuthService.verify(token);
 
       const findUser = (await this.usersModel.findById(user_id)).toJSON();
-      if (findUser?.password) {
-        throw new HttpException('TOKEN_EXPIRED', HttpStatus.BAD_REQUEST, {
-          cause: new Error('Token expired'),
-        });
+      if (findUser?.password && action !== 'FORGOT') {
+        throw new HttpException('TOKEN_EXPIRED', HttpStatus.BAD_REQUEST, { cause: new Error('Token expired') });
       }
 
       const plainToHash = await hash(password, 10);
       await this.usersModel.findByIdAndUpdate(user_id, { password: plainToHash, isVerified: true });
 
       return token;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST, { cause: new Error('TOKEN EXPIRED') });
+    }
+  }
+
+  async forgotPassword({ email }: ForgotPasswordDto): Promise<boolean> {
+    try {
+      const res = await this.usersModel.findOne({ email });
+      if (!res) throw new HttpException('NOT_FOUND', HttpStatus.BAD_REQUEST, { cause: new Error('NOT_FOUND') });
+
+      const token = this.jwtAuthService.sign({ payload: res._id });
+      this.sendMailService.sendEmailWithTemplate({
+        email: [email],
+        fields: { token, name: res.f_name, email: res.email, action: 'FORGOT' },
+        subject: 'Recuperación de contraseña',
+        template: TemplateNamesEnum.CREATE_PASSWORD,
+      });
+      return true;
     } catch (error) {
       throw new HttpException(error, HttpStatus.BAD_REQUEST, { cause: new Error('Validation') });
     }
@@ -141,6 +157,23 @@ export class UsersService {
   async updateUser(user_id: string, body: UpdateUserDto): Promise<boolean> {
     try {
       await this.usersModel.findByIdAndUpdate(user_id, { $set: body });
+      return true;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async updateUserPassword(user_id: string, body: UpdateUserPasswordDto): Promise<boolean> {
+    try {
+      const findUser = (await this.usersModel.findById(user_id)).toJSON();
+      if (!findUser) throw new HttpException('USER NOT FOUND', HttpStatus.BAD_REQUEST, { cause: new Error('NOT FOUND') });
+
+      const checkPassword = await compare(body.current, findUser.password);
+      if (!checkPassword) throw new HttpException('ERROR', 403);
+
+      const plainToHash = await hash(body.new, 10);
+      await this.usersModel.findByIdAndUpdate(user_id, { password: plainToHash });
+
       return true;
     } catch (error) {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
