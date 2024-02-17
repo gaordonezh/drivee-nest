@@ -51,4 +51,34 @@ export class CronService {
       this.logger.debug('ERROR > ', error);
     }
   }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async finalizeBooking() {
+    try {
+      const dateStart = new Date();
+      dateStart.setHours(0, 0, 0);
+      dateStart.setDate(new Date().getDate() + 1);
+
+      const dateEnd = new Date();
+      dateEnd.setHours(23, 59, 59);
+      dateEnd.setDate(new Date().getDate() + 2);
+
+      const toUpdate = await this.bookingModel.find({
+        status: BookingStatusEnum.IN_PROCCESS,
+        endDatetime: { $gte: dateStart, $lte: dateEnd },
+      });
+      this.logger.debug(
+        `Running with ${toUpdate.length} records at from ${dateStart.toISOString()} to ${dateEnd.toISOString()}`,
+      );
+
+      if (!toUpdate.length) return;
+
+      for (const current of toUpdate) {
+        current.status = BookingStatusEnum.FINISHED;
+        await current.save();
+      }
+    } catch (error) {
+      this.logger.debug('ERROR > ', error);
+    }
+  }
 }
