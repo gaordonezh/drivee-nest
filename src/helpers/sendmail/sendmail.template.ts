@@ -151,8 +151,8 @@ export default {
           <h1>¡ES HOY!</h1>
           <h2>Tienes una reservación de ${params.vehicle}</h2>
           <p>Hola ${params.name},</p>
-          <p>Recuerda que tienes que coordinar el pago del alquiler con el dueño del vehículo antes de iniciar. El pago puedes realizarlo directamente con el dueño o mediante nuestro sistema de pago ingresando a <a href="https://drivee.aldo.codes/dashboard/orders">tus rentas</a>.</p>
-          <p>Puedes obtener mas detalles de la reserva ingresando a los detalles de la reservación.</p>
+          <p>Recuerda que tienes que coordinar el pago del alquiler con el dueño del vehículo antes de iniciar.</p>
+          <p>Puedes obtener mas detalles de la reserva ingresando a los detalles de la reservación en <a href="https://drivee.aldo.codes/dashboard/orders">tus rentas</a>.</p>
           <div class="divider"></div>
           <p class="mt-10">Equipo de <b>Drivee</b> ❤️</p>
         </div>

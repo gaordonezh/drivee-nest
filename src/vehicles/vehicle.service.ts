@@ -109,7 +109,6 @@ export class VehiclesService {
             $in: [
               BookingStatusEnum.PENDING,
               BookingStatusEnum.APPROVED,
-              BookingStatusEnum.PAYMENT,
               BookingStatusEnum.IN_PROCCESS,
             ],
           },

@@ -37,9 +37,6 @@ export class CronService {
       if (!toUpdate.length) return;
 
       for (const current of toUpdate) {
-        current.status = BookingStatusEnum.PAYMENT;
-        await current.save();
-
         this.sendMailService.sendEmailWithTemplate({
           email: [current.user.email],
           fields: { vehicle: current.vehicle.name, name: current.user.f_name },
